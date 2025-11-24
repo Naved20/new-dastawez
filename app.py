@@ -220,7 +220,7 @@ def auth_callback():
         flash('Login error. Please try again.', 'error')
         import traceback
         traceback.print_exc()
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('index'))
 
 @app.route('/logout')
 def logout():
