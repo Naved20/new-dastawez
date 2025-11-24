@@ -16,7 +16,9 @@ app.config.update(
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='Lax',
-    PERMANENT_SESSION_LIFETIME=3600
+    PERMANENT_SESSION_LIFETIME=3600,
+    SESSION_COOKIE_DOMAIN=None,  # Let Flask handle domain
+    SESSION_REFRESH_EACH_REQUEST=True
 )
 
 # OAuth Configuration
@@ -44,7 +46,6 @@ google = oauth.register(
 
 # Database Configuration (aapka existing code)
 DATABASE_NAME = 'dastawez.db'
-
 def init_database():
     """Initialize SQLite database and create tables"""
     try:
@@ -181,7 +182,6 @@ def login():
 @app.route('/auth/callback')
 def auth_callback():
     try:
-        print("🔄 Processing OAuth callback...")
         
         token = google.authorize_access_token()
         user_info = google.userinfo()
@@ -200,16 +200,16 @@ def auth_callback():
             })
             
             if save_success:
-                # ✅ SESSION SET KAREN
+
+                session.clear()
                 session['user'] = {
                     'name': user_info.get('name'),
                     'email': user_info.get('email'),
                     'picture': user_info.get('picture')
                 }
-                session.permanent = True  # ✅ IMPORTANT FOR VERCELL
+                session.permanent = True 
                 
                 flash('Login successful!', 'success')
-                print(f"🎉 User logged in: {user_info.get('email')}")
                 return redirect(url_for('dashboard'))  # ✅ DASHBOARD PE redirect
             else:
                 flash('Login successful but data save failed.', 'warning')
@@ -218,9 +218,9 @@ def auth_callback():
             
     except Exception as e:
         flash('Login error. Please try again.', 'error')
-        print(f"❌ Auth callback error: {e}")
-    
-    return redirect(url_for('index'))
+        import traceback
+        traceback.print_exc()
+    return redirect(url_for('dashboard'))
 
 @app.route('/logout')
 def logout():
