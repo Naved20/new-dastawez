@@ -24,7 +24,7 @@ oauth = OAuth(app)
 
 # ✅ EXACT REDIRECT URIS USE KAREN
 if os.getenv('VERCEL'):
-    REDIRECT_URI = 'https://damy-dastawez-h1p9.vercel.app/auth/callback'
+    REDIRECT_URI = 'https://new-dastawez.vercel.app/auth/callback'
 else:
     REDIRECT_URI = 'http://127.0.0.1:5000/auth/callback'
 
