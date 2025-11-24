@@ -2,8 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from authlib.integrations.flask_client import OAuth
 import os
 import sqlite3
+import uuid
 from functools import wraps
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -20,6 +21,8 @@ app.config.update(
     SESSION_COOKIE_DOMAIN=None,  # Let Flask handle domain
     SESSION_REFRESH_EACH_REQUEST=True
 )
+
+
 
 # OAuth Configuration
 oauth = OAuth(app)
@@ -199,6 +202,7 @@ def auth_callback():
                 'refresh_token': token.get('refresh_token')
             })
             
+            
             if save_success:
 
                 session.clear()
@@ -210,7 +214,7 @@ def auth_callback():
                 session.permanent = True 
                 
                 flash('Login successful!', 'success')
-                return redirect(url_for('dashboard'))  # ✅ DASHBOARD PE redirect
+                return redirect(url_for('dashboard'))  
             else:
                 flash('Login successful but data save failed.', 'warning')
         else:
@@ -254,6 +258,71 @@ def debug():
 # Initialize database when app starts
 with app.app_context():
     init_database()
+
+
+
+
+def setup_database_sessions():
+    """Create sessions table"""
+    conn = sqlite3.connect(DATABASE_NAME)
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS sessions (
+            session_id TEXT PRIMARY KEY,
+            user_data TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    conn.commit()
+    conn.close()
+
+def save_session(session_id, user_data):
+    """Save session to database"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    import json
+    user_json = json.dumps(user_data)
+    
+    cursor.execute('''
+        INSERT OR REPLACE INTO sessions (session_id, user_data, last_accessed)
+        VALUES (?, ?, ?)
+    ''', (session_id, user_json, datetime.now()))
+    
+    conn.commit()
+    conn.close()
+
+def get_session(session_id):
+    """Get session from database"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('SELECT user_data FROM sessions WHERE session_id = ?', (session_id,))
+    result = cursor.fetchone()
+    conn.close()
+    
+    if result:
+        import json
+        return json.loads(result[0])
+    return None
+
+def delete_session(session_id):
+    """Delete session from database"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM sessions WHERE session_id = ?', (session_id,))
+    conn.commit()
+    conn.close()
+
+# Initialize sessions table
+setup_database_sessions()
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
