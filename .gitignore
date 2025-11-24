@@ -1,0 +1,135 @@
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Windows thumbnail cache and metadata
+Thumbs.db:encryptable
+
+# Editor and IDE
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.code-workspace
+.env/
+.env
+# Vim / Emacs / other editor swap & backup files
+*~
+*.swp
+*.swo
+*.swn
+.#*
+*.bak
+*.orig
+
+# JetBrains
+*.iml
+out/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp.*
+.pnp.js
+package-lock.json.lockfile
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+venv/
+.venv/
+env/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtualenv / pipenv / poetry
+.env
+.env.*
+Pipfile.lock
+poetry.lock
+
+# Build / distribution
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs
+*.log
+logs/
+debug.log
+
+# Secrets / keys / local config
+*.pem
+*.key
+*.crt
+.secret
+secrets.yml
+local.settings.json
+
+# LaTeX / document build artifacts
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.synctex.gz
+*.bbl
+*.blg
+_build/
+latexmkrc
+
+# Sphinx / docs
+docs/_build/
+_build/
+site/
+
+# Office temporary files (LibreOffice / MS Office)
+~$*
+~*.tmp
+*.~lock.*
+
+# Images / media caches
+*.cache
+.cache/
+thumbs.db
+
+# Coverage / test results
+coverage/
+.nyc_output/
+test-results/
+
+# Docker / containers
+docker-compose.override.yml
+docker-compose.*.yml
+
+# Composer / PHP
+vendor/
+composer.lock
+
+# Misc
+*.class
+*.jar
+*.war
+*.zip
+*.tar.gz
+
+# Keep this file tracked; add project-specific ignores below
+# e.g. /my-secret-file.ext

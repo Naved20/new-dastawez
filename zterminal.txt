@@ -1,0 +1,24 @@
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# On Windows:
+venv\Scripts\activate
+# On Linux:
+source venv/bin/activate
+
+
+install flask app {
+    pip install flask
+}
+
+for remove git main origin {
+    git remote remove origin
+    rm -r -fo .git
+}
+
+
+for generate the secret key {
+    python -c "import secrets; print(secrets.token_hex(32))"
+
+}

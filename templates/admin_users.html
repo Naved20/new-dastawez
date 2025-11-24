@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Users</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="logo flex items-center">
+                <div class="h-12 w-12 bg-white rounded-full flex items-center justify-center mr-3 overflow-hidden">
+                    <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" class="h-full w-full object-cover">
+                </div>
+                <h1 class="text-white text-2xl font-bold">Dasta<span class="text-yellow-400">wez</span> Admin</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="text-white">Welcome, {{ current_user.name }}</span>
+                <a href="{{ url_for('dashboard') }}" class="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100 transition">
+                    Dashboard
+                </a>
+                <a href="{{ url_for('logout') }}" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
+                    Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold mb-6">Registered Users ({{ users|length }})</h2>
+            
+            {% if users %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="py-3 px-4 text-left">ID</th>
+                            <th class="py-3 px-4 text-left">Name</th>
+                            <th class="py-3 px-4 text-left">Email</th>
+                            <th class="py-3 px-4 text-left">Google ID</th>
+                            <th class="py-3 px-4 text-left">Created At</th>
+                            <th class="py-3 px-4 text-left">Last Login</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="py-3 px-4">{{ user['id'] }}</td>
+                            <td class="py-3 px-4">
+                                <div class="flex items-center">
+                                    <img src="{{ user['picture'] }}" alt="{{ user['name'] }}" class="w-8 h-8 rounded-full mr-2">
+                                    {{ user['name'] }}
+                                </div>
+                            </td>
+                            <td class="py-3 px-4">{{ user['email'] }}</td>
+                            <td class="py-3 px-4 text-sm">{{ user['google_id'] or 'N/A' }}</td>
+                            <td class="py-3 px-4 text-sm">{{ user['created_at'] }}</td>
+                            <td class="py-3 px-4 text-sm">{{ user['last_login'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-users text-4xl mb-4 text-gray-300"></i>
+                <p>No users found in database.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

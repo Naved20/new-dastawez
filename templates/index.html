@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dastawez</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/jpg" href="../static/img/logo.png" />
+    <style>
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header-animate {
+            animation: fadeInDown 1s ease-out;
+        }
+        
+        .service-card {
+            transition: all 0.3s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #f59e0b;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .footer-link {
+            position: relative;
+        }
+        
+        .footer-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -2px;
+            left: 0;
+            background-color: #3b82f6;
+            transition: width 0.3s ease;
+        }
+        
+        .footer-link:hover::after {
+            width: 100%;
+        }
+        
+        .contact-card {
+            transition: all 0.3s ease;
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-5px);
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background: #f59e0b;
+            margin: 12px auto 0;
+        }
+
+        /* FAQ Accordion Styles */
+        .faq-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <!-- Header Section -->
+<header class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-md sticky top-0 z-50 header-animate">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="logo flex items-center">
+            <div class="h-12 w-12 bg-white rounded-full flex items-center justify-center mr-3 overflow-hidden">
+                <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" class="h-full w-full object-cover">
+            </div>
+            <h1 class="text-white text-2xl font-bold">Dasta<span class="text-yellow-400">wez</span></h1>
+        </div>
+
+        <nav class="md:block" id="mainNav">
+            {% if user %}
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <img src="{{ user.picture }}" alt="Profile" class="w-8 h-8 rounded-full">
+                    <span class="text-white text-sm">{{ user.name }}</span>
+                </div>
+                <a href="{{ url_for('dashboard') }}" 
+                   class="glass-morphism-button bg-white bg-opacity-20 backdrop-blur-md text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-30 transition-all duration-300 border border-white border-opacity-30 shadow-lg hover:shadow-xl">
+                    Dashboard
+                </a>
+                <a href="{{ url_for('logout') }}" 
+                   class="glass-morphism-button bg-red-500 bg-opacity-20 backdrop-blur-md text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-30 transition-all duration-300 border border-white border-opacity-30 shadow-lg hover:shadow-xl">
+                    Logout
+                </a>
+            </div>
+            {% else %}
+            <a href="{{ url_for('login') }}" 
+            class="glass-morphism-button bg-white bg-opacity-20 backdrop-blur-md text-white font-semibold py-2 px-6 rounded-lg hover:bg-opacity-30 transition-all duration-300 border border-white border-opacity-30 shadow-lg hover:shadow-xl hover:scale-105">
+               
+                Login 
+            </a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+    <!-- Hero Section -->
+    <section id="home" class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20 md:py-28">
+        <div class="container mx-auto px-4 text-center">
+            <div class="max-w-3xl mx-auto">
+                <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+                    Instant Printing & MP Online Services <span class="text-yellow-400">Delivered</span> to Your Doorstep
+                </h2>
+                <p class="text-lg md:text-xl mb-8 text-blue-100">
+                    Fast, reliable, and affordable solutions for all your printing and government service needs. 
+                    We handle the paperwork so you don't have to!
+                </p>
+            </div>
+        </div>
+    </section>
+
+   
+    <!-- How It Works Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 section-title">
+                    How It Works
+                </h2>
+                <p class="text-gray-600 mt-4 max-w-2xl mx-auto">
+                    Simple steps to get your documents ready without leaving your home
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm text-center">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-blue-600 text-2xl font-bold">1</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Place Your Order</h3>
+                    <p class="text-gray-600">
+                        Fill our simple form with your requirements or upload your documents
+                    </p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm text-center">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-blue-600 text-2xl font-bold">2</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">We Process It</h3>
+                    <p class="text-gray-600">
+                        Our experts handle all the paperwork, printing, and processing
+                    </p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm text-center">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-blue-600 text-2xl font-bold">3</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Delivery to You</h3>
+                    <p class="text-gray-600">
+                        Get your documents delivered to your doorstep or via email
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 section-title">
+                    Contact Us
+                </h2>
+                <p class="text-gray-600 mt-4 max-w-2xl mx-auto">
+                    Have questions or need assistance? We're here to help!
+                </p>
+            </div>
+            
+            <div class="flex flex-wrap justify-center gap-6 mb-12">
+                <!-- WhatsApp Card -->
+                <div class="bg-blue-50 rounded-xl p-6 text-center min-w-[200px] flex-1 contact-card">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-whatsapp text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Chat on WhatsApp</h3>
+                    <p class="text-gray-600 mb-3">Quick responses during business hours</p>
+        <a href="https://wa.me/917898282349" 
+           class="inline-flex items-center justify-center bg-white bg-opacity-20 backdrop-blur-md text-blue-700 px-5 py-3 rounded-xl font-medium transition-all duration-300 border border-blue-200 border-opacity-50 shadow-lg hover:bg-opacity-30 hover:shadow-xl hover:scale-105 w-full">
+            <i class="fab fa-whatsapp text-lg mr-2"></i>Message Us
+        </a>
+                </div>
+                
+                <!-- Phone Card -->
+                <div class="bg-blue-50 rounded-xl p-6 text-center min-w-[200px] flex-1 contact-card">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-phone-alt text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Call Us</h3>
+                    <p class="text-gray-600 mb-3">Monday to Saturday : 9AM - 7PM</p>
+           <a href="tel:+917898282349" 
+           class="inline-flex items-center justify-center bg-white bg-opacity-20 backdrop-blur-md text-blue-700 px-4 py-3 rounded-xl font-medium transition-all duration-300 border border-blue-200 border-opacity-50 shadow-lg hover:bg-opacity-30 hover:shadow-xl hover:scale-105 w-full">
+            <i class="fas fa-phone-alt text-lg mr-2"></i>+91-7898282349
+        </a>
+                </div>
+                
+                <!-- Email Card -->
+                <div class="bg-blue-50 rounded-xl p-6 text-center min-w-[200px] flex-1 contact-card">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-envelope text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Email Us</h3>
+                    <p class="text-gray-600 mb-3">For detailed inquiries Email Us</p>
+        <a href="mailto:dastawez.in@gmail.com" 
+           class="inline-flex items-center justify-center bg-white bg-opacity-20 backdrop-blur-md text-blue-700 px-5 py-3 rounded-xl font-medium transition-all duration-300 border border-blue-200 border-opacity-50 shadow-lg hover:bg-opacity-30 hover:shadow-xl hover:scale-105 w-full">
+            <i class="fas fa-envelope text-lg mr-2"></i>Email Us
+        </a>
+                </div>
+
+                <!-- Link Tree Card -->
+                <div class="bg-blue-50 rounded-xl p-6 text-center min-w-[200px] flex-1 contact-card">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-tree text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Link Tree</h3>
+                    <p class="text-gray-600 mb-3">Visit our more social platforms</p>
+        <a href="https://linktr.ee/dastawez" 
+           class="inline-flex items-center justify-center bg-white bg-opacity-20 backdrop-blur-md text-blue-700 px-5 py-3 rounded-xl font-medium transition-all duration-300 border border-blue-200 border-opacity-50 shadow-lg hover:bg-opacity-30 hover:shadow-xl hover:scale-105 w-full">
+            <i class="fas fa-tree text-lg mr-2"></i>Linktree
+        </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 section-title">
+                    Frequently Asked Questions
+                </h2>
+                <p class="text-gray-600 mt-4 max-w-2xl mx-auto">
+                    Find answers to common questions about our services
+                </p>
+            </div>
+            
+            <div class="max-w-3xl mx-auto space-y-4">
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <button class="flex justify-between items-center w-full text-left font-semibold text-gray-800 focus:outline-none faq-button">
+                        <span>How long does it take to process government documents?</span>
+                        <i class="fas fa-chevron-down text-blue-500 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content mt-3 text-gray-600">
+                        Processing times vary depending on the document and government department. Typically, simple certificates like domicile or income certificates take 2-3 working days, while more complex documents may take up to a week.
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <button class="flex justify-between items-center w-full text-left font-semibold text-gray-800 focus:outline-none faq-button">
+                        <span>What documents do I need to provide for certificate applications?</span>
+                        <i class="fas fa-chevron-down text-blue-500 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content mt-3 text-gray-600">
+                        Requirements vary by certificate type. Generally, you'll need proof of identity (Aadhaar, PAN), proof of address, and any supporting documents specific to the certificate. Our team will guide you through the exact requirements for your specific need.
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <button class="flex justify-between items-center w-full text-left font-semibold text-gray-800 focus:outline-none faq-button">
+                        <span>Do you offer delivery services?</span>
+                        <i class="fas fa-chevron-down text-blue-500 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content mt-3 text-gray-600">
+                        Yes! We offer doorstep delivery for all physical documents within our service areas. Digital services and soft copies are delivered via email or cloud sharing platforms for your convenience.
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <button class="flex justify-between items-center w-full text-left font-semibold text-gray-800 focus:outline-none faq-button">
+                        <span>How do I pay for your services?</span>
+                        <i class="fas fa-chevron-down text-blue-500 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content mt-3 text-gray-600">
+                        We accept multiple payment methods including UPI, credit/debit cards, net banking, and cash on delivery (for physical services). Payment links will be shared after order confirmation.
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <button class="flex justify-between items-center w-full text-left font-semibold text-gray-800 focus:outline-none faq-button">
+                        <span>Can you help with corrections in official documents?</span>
+                        <i class="fas fa-chevron-down text-blue-500 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content mt-3 text-gray-600">
+                        Yes, we assist with document corrections and amendments. The process depends on the type of document and the issuing authority. Contact us with your specific requirements for detailed guidance.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 bg-gradient-to-r from-blue-600 to-blue-800 text-white text-center">
+        <div class="container mx-auto px-4">
+            <h2 class="text-2xl md:text-3xl font-bold mb-6">Ready to Simplify Your Document Needs?</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto">
+                Let us handle the paperwork while you focus on what matters most
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="{{ url_for('login') }}" 
+                    class="glass-morphism-button bg-white bg-opacity-20 backdrop-blur-md text-white font-semibold py-2 px-6 rounded-lg hover:bg-opacity-30 transition-all duration-300 border border-white border-opacity-30 shadow-lg hover:shadow-xl hover:scale-105">
+
+                  
+                    Order Now <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white pt-12 pb-6">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-wrap gap-8 mb-8">
+                <!-- About Column -->
+                <div class="flex-1 min-w-[200px]">
+                    <div class="flex items-center mb-4">
+                        <div class="h-12 w-12 bg-white rounded-full flex items-center justify-center mr-3 overflow-hidden">
+                          <img src="../static/img/logo.jpg" alt="" class="h-full w-full object-cover">
+                        </div>
+                        <h3 class="text-xl font-bold">Dasta<span class="text-yellow-400">wez</span></h3>
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        Your trusted partner for all document and government service needs.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://chat.whatsapp.com/ELYNoYxFIaC6p4ztD8WPQh" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="https://www.instagram.com/dastawez.in?igsh=MXZnZmFoNzhuNTlncg==" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Services Column -->
+                <div class="flex-1 min-w-[200px]">
+                    <h3 class="text-lg font-semibold mb-4">Services</h3>
+                    <ul class="space-y-2">
+                        <li><a href="./index.html" class="text-gray-400 hover:text-white footer-link">MP Online Services</a></li>
+                        <li><a href="./index.html" class="text-gray-400 hover:text-white footer-link">Academic Forms</a></li>
+                        <li><a href="./index.html" class="text-gray-400 hover:text-white footer-link">Document Services</a></li>
+                        <li><a href="./index.html" class="text-gray-400 hover:text-white footer-link">Digital Services</a></li>
+                        <li><a href="./index.html" class="text-gray-400 hover:text-white footer-link">Exam Forms</a></li>
+                        <li><a href="./invoice.html" class="text-gray-400 hover:text-white footer-link">Invoice</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Quick Links Column -->
+                <div class="flex-1 min-w-[200px]">
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-gray-400 hover:text-white footer-link">Home</a></li>
+                        <li><a href="#services" class="text-gray-400 hover:text-white footer-link">Services</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-white footer-link">Contact</a></li>
+                        <li><a href="./about.html" class="text-gray-400 hover:text-white footer-link">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white footer-link">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact Column -->
+                <div class="flex-1 min-w-[200px]">
+                    <h3 class="text-lg font-semibold mb-4">Contact Info</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-3 text-blue-400"></i>
+                            <span>Bhopal, Madhya Pradesh, India</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-phone-alt mt-1 mr-3 text-blue-400"></i>
+                            <a href="tel:+917898282349" class="hover:text-white">+91-7898282349</a>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-envelope mt-1 mr-3 text-blue-400"></i>
+                            <a href="mailto:dastawez.in@gmail.com" class="hover:text-white">dastawez.in@gmail.com</a>
+                        </li>
+                         <li class="flex items-start">
+                            <i class="fas fa-tree mt-1 mr-3 text-blue-400"></i>
+                            <a href="https://linktr.ee/dastawez" class="hover:text-white">Link Tree</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="pt-6 mt-6 border-t border-gray-700 text-center text-gray-500 text-sm">
+                <p>&copy; 2025 Dastawez. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // FAQ accordion functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const faqButtons = document.querySelectorAll('.faq-button');
+            
+            faqButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    const icon = button.querySelector('i');
+                    
+                    // Close all other FAQ items
+                    faqButtons.forEach(otherButton => {
+                        if (otherButton !== button) {
+                            const otherContent = otherButton.nextElementSibling;
+                            const otherIcon = otherButton.querySelector('i');
+                            otherContent.style.maxHeight = null;
+                            otherIcon.classList.remove('fa-chevron-up');
+                            otherIcon.classList.add('fa-chevron-down');
+                        }
+                    });
+                    
+                    // Toggle current FAQ item
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.classList.remove('fa-chevron-up');
+                        icon.classList.add('fa-chevron-down');
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        icon.classList.remove('fa-chevron-down');
+                        icon.classList.add('fa-chevron-up');
+                    }
+                });
+            });
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
