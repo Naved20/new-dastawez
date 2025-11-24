@@ -176,7 +176,7 @@ def login():
     except Exception as e:
         flash('Login service is temporarily unavailable.', 'error')
         print(f"❌ Login error: {e}")
-        return redirect(url_for('index'))
+        return redirect(url_for('dashboard'))
 
 @app.route('/auth/callback')
 def auth_callback():
