@@ -15,7 +15,6 @@ app.secret_key = os.getenv('SECRET_KEY', 'b3f7ac0694f59e4983adb080c3f4ca48621b0b
 # Session Configuration
 app.config.update(
     SESSION_COOKIE_SECURE=True,
-    SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='Lax',
     PERMANENT_SESSION_LIFETIME=3600,
     SESSION_COOKIE_DOMAIN=None,  # Let Flask handle domain
