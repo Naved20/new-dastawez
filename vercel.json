@@ -1,5 +1,4 @@
 {
-  "version": 2,
   "builds": [
     {
       "src": "app.py",
@@ -9,15 +8,10 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/app.py"
+      "dest": "app.py"
     }
   ],
   "env": {
-    "SECRET_KEY": "b3f7ac0694f59e4983adb080c3f4ca48621b0b0ce1759d07422cabf6b5bd7ea4"
+    "PYTHON_VERSION": "3.9"
   }
 }
-
-
-
-
-

@@ -1,32 +1,45 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+# app.py
+from flask import Flask, render_template, request, redirect, url_for, session, flash, g
 from authlib.integrations.flask_client import OAuth
 import os
-import sqlite3
-import uuid
 from functools import wraps
-from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
 
+# Initialize MongoDB connection - don't import db directly yet
+from database.mongo import db_connection
+
+# Import routes
+from routes.user_routes import user_routes
+
+# Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'b3f7ac0694f59e4983adb080c3f4ca48621b0b0ce1759d07422cabf6b5bd7ea4')
-IS_PRODUCTION = os.getenv("FLASK_ENV") == "production"
+
+# Initialize MongoDB with app
+db_connection.init_app(app)
+
 # Session Configuration
 app.config.update(
-    SESSION_COOKIE_SECURE=os.getenv('VERCEL') == '1', 
-    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SECURE=False if not os.getenv('VERCEL') else True,
     SESSION_COOKIE_SAMESITE='Lax',
-    PERMANENT_SESSION_LIFETIME=timedelta(hours=1),
-    SESSION_REFRESH_EACH_REQUEST=True
+    PERMANENT_SESSION_LIFETIME=3600,
+    SESSION_COOKIE_DOMAIN=None,
+    SESSION_REFRESH_EACH_REQUEST=True,
+    # Add MongoDB URI to config
+    MONGO_URI=os.getenv("MONGO_URI"),
+    DB_NAME=os.getenv("DB_NAME", "dastawez")
 )
 
-
+# Register blueprints
+app.register_blueprint(user_routes, url_prefix='/api')
 
 # OAuth Configuration
 oauth = OAuth(app)
 
-# ✅ EXACT REDIRECT URIS USE KAREN
+# Determine redirect URI based on environment
 if os.getenv('VERCEL'):
     REDIRECT_URI = 'https://new-dastawez.vercel.app/auth/callback'
 else:
@@ -34,6 +47,7 @@ else:
 
 print(f"🔧 Using Redirect URI: {REDIRECT_URI}")
 
+# Register Google OAuth
 google = oauth.register(
     name='google',
     client_id=os.getenv("GOOGLE_CLIENT_ID"),
@@ -45,118 +59,26 @@ google = oauth.register(
     }
 )
 
+# Initialize database connection
+def get_users_collection():
+    """Get users collection with fresh connection"""
+    db = db_connection.get_db()
+    return db['users']
 
-# Database Configuration (aapka existing code)
-DATABASE_NAME = 'dastawez.db'
-def init_database():
-    """Initialize SQLite database and create tables"""
+# Import and initialize indexes AFTER db is ready
+def initialize_database():
+    """Initialize database indexes"""
     try:
-        conn = sqlite3.connect(DATABASE_NAME)
-        cursor = conn.cursor()
-        
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS oauth_callbacks (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                google_id TEXT UNIQUE,
-                name TEXT NOT NULL,
-                email TEXT UNIQUE NOT NULL,
-                picture TEXT,
-                access_token TEXT,
-                refresh_token TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        
-        conn.commit()
-        conn.close()
-        print("✅ Database initialized successfully!")
-        
+        from services.user_service import create_indexes
+        create_indexes()
+        print("✅ Database indexes created successfully")
     except Exception as e:
-        print(f"❌ Database initialization error: {e}")
+        print(f"⚠️ Could not create indexes: {e}")
 
-def get_db_connection():
-    """Get database connection"""
-    conn = sqlite3.connect(DATABASE_NAME)
-    conn.row_factory = sqlite3.Row
-    return conn
+# Call initialization
+initialize_database()
 
-def save_user_data(user_data, tokens=None):
-    """Save or update user data in database"""
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute('SELECT * FROM oauth_callbacks WHERE email = ?', (user_data['email'],))
-        existing_user = cursor.fetchone()
-        
-        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        
-        if existing_user:
-            cursor.execute('''
-                UPDATE oauth_callbacks 
-                SET name = ?, picture = ?, last_login = ?, access_token = ?, refresh_token = ?
-                WHERE email = ?
-            ''', (
-                user_data['name'], 
-                user_data['picture'], 
-                current_time, 
-                tokens.get('access_token') if tokens else None,
-                tokens.get('refresh_token') if tokens else None,
-                user_data['email']
-            ))
-            print(f"✅ User updated: {user_data['email']}")
-        else:
-            cursor.execute('''
-                INSERT INTO oauth_callbacks 
-                (google_id, name, email, picture, access_token, refresh_token, created_at, last_login)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
-                user_data.get('id'),
-                user_data['name'],
-                user_data['email'],
-                user_data['picture'],
-                tokens.get('access_token') if tokens else None,
-                tokens.get('refresh_token') if tokens else None,
-                current_time,
-                current_time
-            ))
-            print(f"✅ New user saved: {user_data['email']}")
-        
-        conn.commit()
-        conn.close()
-        return True
-        
-    except Exception as e:
-        print(f"❌ Error saving user data: {e}")
-        return False
-
-def get_user_by_email(email):
-    """Get user data by email"""
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM oauth_callbacks WHERE email = ?', (email,))
-        user = cursor.fetchone()
-        conn.close()
-        return user
-    except Exception as e:
-        print(f"❌ Error getting user data: {e}")
-        return None
-
-def get_all_users():
-    """Get all users from database"""
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM oauth_callbacks ORDER BY created_at DESC')
-        users = cursor.fetchall()
-        conn.close()
-        return users
-    except Exception as e:
-        print(f"❌ Error getting all users: {e}")
-        return []
-
+# Decorator for protected routes
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -166,6 +88,7 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# Routes
 @app.route('/')
 def index():
     user = session.get('user')
@@ -175,20 +98,21 @@ def index():
 def login():
     try:
         print(f"🔗 Using redirect URI: {REDIRECT_URI}")
-        return google.authorize_redirect(REDIRECT_URI)  # ✅ DIRECT URI USE KAREN
+        return google.authorize_redirect(REDIRECT_URI)
     except Exception as e:
         flash('Login service is temporarily unavailable.', 'error')
         print(f"❌ Login error: {e}")
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('index'))
 
 @app.route('/auth/callback')
 def auth_callback():
     try:
-        
+        print("🔄 OAuth callback started...")
         token = google.authorize_access_token()
         user_info = google.userinfo()
         
         if user_info:
+            print(f"✅ User info received: {user_info.get('email')}")
             user_data = {
                 'id': user_info.get('sub'),
                 'name': user_info.get('name'),
@@ -196,14 +120,17 @@ def auth_callback():
                 'picture': user_info.get('picture')
             }
             
+            print(f"📋 Saving user data: {user_data}")
+            
+            from services.user_service import save_user_data
             save_success = save_user_data(user_data, {
                 'access_token': token.get('access_token'),
                 'refresh_token': token.get('refresh_token')
             })
             
+            print(f"💾 Save result: {save_success}")
             
             if save_success:
-
                 session.clear()
                 session['user'] = {
                     'name': user_info.get('name'),
@@ -213,16 +140,19 @@ def auth_callback():
                 session.permanent = True 
                 
                 flash('Login successful!', 'success')
-                return redirect(url_for('dashboard'))  
+                return redirect(url_for('dashboard'))
             else:
                 flash('Login successful but data save failed.', 'warning')
+                return redirect(url_for('index'))
         else:
             flash('Login failed. Please try again.', 'error')
             
     except Exception as e:
         flash('Login error. Please try again.', 'error')
+        print(f"❌ Auth callback error: {e}")
         import traceback
         traceback.print_exc()
+    
     return redirect(url_for('index'))
 
 @app.route('/logout')
@@ -235,93 +165,102 @@ def logout():
 @login_required
 def dashboard():
     user = session.get('user')
-    db_user = get_user_by_email(user['email']) if user else None
-    return render_template('dashboard.html', user=user, db_user=db_user)
+    if user:
+        from services.user_service import get_user_by_email
+        db_user = get_user_by_email(user['email'])
+        print(f"📊 Dashboard accessed by: {user['email']}, DB user: {db_user is not None}")
+        return render_template('dashboard.html', user=user, db_user=db_user)
+    return redirect(url_for('index'))
 
 @app.route('/admin')
 @login_required
 def admin_users():
+    from services.user_service import get_all_users
     users = get_all_users()
     return render_template('admin_users.html', users=users, current_user=session.get('user'))
 
-# ✅ DEBUG ROUTE ADD KAREN
+# Debug routes
 @app.route('/debug')
 def debug():
     return {
         'vercel_env': os.getenv('VERCEL'),
         'vercel_url': os.getenv('VERCEL_URL'),
         'redirect_uri': REDIRECT_URI,
-        'session_user': session.get('user')
+        'session_user': session.get('user'),
+        'python_version': os.sys.version,
+        'mongo_connected': db_connection.client is not None
     }
 
-# Initialize database when app starts
-with app.app_context():
-    init_database()
+@app.route('/debug/db')
+def debug_db():
+    """Debug database connection"""
+    try:
+        users_collection = get_users_collection()
+        users_count = users_collection.count_documents({})
+        users = list(users_collection.find({}, {'_id': 0, 'name': 1, 'email': 1}).limit(5))
+        
+        return {
+            'status': 'connected',
+            'database': db_connection.db.name if db_connection.db else None,
+            'collection': 'users',
+            'total_users': users_count,
+            'sample_users': users,
+            'connection_alive': db_connection.client is not None
+        }
+    except Exception as e:
+        return {
+            'status': 'error',
+            'error': str(e)
+        }
 
-
-
-
-def setup_database_sessions():
-    """Create sessions table"""
-    conn = sqlite3.connect(DATABASE_NAME)
-    cursor = conn.cursor()
+@app.route('/debug/save-test')
+def debug_save_test():
+    """Test user save functionality"""
+    from services.user_service import save_user_data
     
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS sessions (
-            session_id TEXT PRIMARY KEY,
-            user_data TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
+    test_user = {
+        "id": "debug_123",
+        "name": "Debug User",
+        "email": "debug@example.com",
+        "picture": "debug.jpg"
+    }
     
-    conn.commit()
-    conn.close()
-
-def save_session(session_id, user_data):
-    """Save session to database"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    success = save_user_data(test_user, {
+        "access_token": "debug_token",
+        "refresh_token": "debug_refresh"
+    })
     
-    import json
-    user_json = json.dumps(user_data)
-    
-    cursor.execute('''
-        INSERT OR REPLACE INTO sessions (session_id, user_data, last_accessed)
-        VALUES (?, ?, ?)
-    ''', (session_id, user_json, datetime.now()))
-    
-    conn.commit()
-    conn.close()
+    return {
+        "success": success,
+        "user": test_user,
+        "collection": "users",
+        "connection_alive": db_connection.client is not None
+    }
 
-def get_session(session_id):
-    """Get session from database"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    cursor.execute('SELECT user_data FROM sessions WHERE session_id = ?', (session_id,))
-    result = cursor.fetchone()
-    conn.close()
-    
-    if result:
-        import json
-        return json.loads(result[0])
-    return None
-
-def delete_session(session_id):
-    """Delete session from database"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('DELETE FROM sessions WHERE session_id = ?', (session_id,))
-    conn.commit()
-    conn.close()
-
-# Initialize sessions table
-setup_database_sessions()
-
-
-
-
+@app.route('/debug/ping')
+def debug_ping():
+    """Ping MongoDB to check connection"""
+    try:
+        # Ping the database
+        db_connection.client.admin.command('ping')
+        return {
+            "status": "connected",
+            "message": "MongoDB connection is active",
+            "database": db_connection.db.name if db_connection.db else None
+        }
+    except Exception as e:
+        return {
+            "status": "disconnected",
+            "error": str(e)
+        }
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Ensure MongoDB is connected before starting
+    print("🚀 Starting Flask application...")
+    
+    # Connect to MongoDB
+    db = db_connection.get_db()
+    print(f"📊 Database: {db.name}")
+    print(f"🔗 Connection status: {'Connected' if db_connection.client is not None else 'Disconnected'}")
+    
+    app.run(debug=True, host='0.0.0.0', port=5000)

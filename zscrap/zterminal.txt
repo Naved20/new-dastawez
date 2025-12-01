@@ -22,3 +22,8 @@ for generate the secret key {
     python -c "import secrets; print(secrets.token_hex(32))"
 
 }
+
+
+for mongo db {
+    python -m pip install "pymongo[srv]"
+}
