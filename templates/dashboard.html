@@ -6,79 +6,502 @@
     <title>Dashboard - Dastawez</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Custom animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .dropdown-animation {
+            animation: fadeIn 0.2s ease-out;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
     <!-- Header -->
-    <header class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-md">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="logo flex items-center">
-                <div class="h-12 w-12 bg-white rounded-full flex items-center justify-center mr-3 overflow-hidden">
-                    <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" class="h-full w-full object-cover">
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Top Left: Company/Brand Logo -->
+                <div class="logo flex items-center">
+                    <div class="h-12 w-12 bg-white rounded-full flex items-center justify-center mr-3 overflow-hidden shadow-md">
+                        <img src="{{ url_for('static', filename='img/logo.jpg') }}" 
+                             alt="Dastawez Logo" 
+                             class="h-full w-full object-cover">
+                    </div>
+                    <div>
+                        <h1 class="text-white text-2xl font-bold">Dasta<span class="text-yellow-400">wez</span></h1>
+                        <p class="text-blue-200 text-xs">Your Digital Document Manager</p>
+                    </div>
                 </div>
-                <h1 class="text-white text-2xl font-bold">Dasta<span class="text-yellow-400">wez</span></h1>
-            </div>
-            
-            <div class="flex items-center space-x-4">
-                <div class="flex items-center space-x-2">
-                    <img src="{{ user.picture }}" alt="Profile" class="w-8 h-8 rounded-full">
-                    <span class="text-white text-sm">{{ user.name }}</span>
+                
+                <!-- Top Right: User Profile Section with Dropdown -->
+                <div class="relative">
+                    <!-- Profile Button -->
+                    <button id="profileDropdownBtn" 
+                            class="flex items-center space-x-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm 
+                                   rounded-xl px-4 py-2 transition-all duration-200 focus:outline-none 
+                                   focus:ring-2 focus:ring-white/30">
+                        <!-- User Avatar -->
+                        <div class="relative">
+                            <img src="{{ user.picture }}" 
+                                 alt="Profile" 
+                                 class="w-10 h-10 rounded-full border-2 border-white/30 object-cover">
+                            <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                        </div>
+                        
+                        <!-- User Name and Role -->
+                        <div class="text-left hidden md:block">
+                            <p class="text-white font-medium text-sm">{{ user.name }}</p>
+                            <p class="text-blue-200 text-xs">
+                                {% if user.email == 'admin@example.com' %}
+                                    Administrator
+                                {% else %}
+                                    Premium User
+                                {% endif %}
+                            </p>
+                        </div>
+                        
+                        <!-- Dropdown Icon -->
+                        <i class="fas fa-chevron-down text-white/70 text-sm transition-transform duration-200"></i>
+                    </button>
+                    
+                    <!-- Dropdown Menu -->
+                    <div id="profileDropdown" 
+                         class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl 
+                                border border-gray-200 overflow-hidden dropdown-animation hidden 
+                                transform origin-top-right">
+                        
+                        <!-- Dropdown Header -->
+                        <div class="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+                            <div class="flex items-center space-x-3">
+                                <img src="{{ user.picture }}" 
+                                     alt="Profile" 
+                                     class="w-12 h-12 rounded-full border-2 border-white shadow">
+                                <div>
+                                    <p class="font-semibold text-gray-800">{{ user.name }}</p>
+                                    <p class="text-sm text-gray-600">{{ user.email }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Dropdown Items -->
+                        <div class="py-2">
+                            <a href="{{ url_for('profile') }}" 
+                               class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                                <i class="fas fa-user-circle w-6 text-gray-400"></i>
+                                <span class="ml-3">Profile</span>
+                            </a>
+                            
+                            <a href="{{ url_for('orders') }}" 
+                               class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                                <i class="fas fa-shopping-bag w-6 text-gray-400"></i>
+                                <span class="ml-3">Orders</span>
+                                <span class="ml-auto bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full">3 new</span>
+                            </a>
+                            
+                            <a href="{{ url_for('settings') }}" 
+                               class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                                <i class="fas fa-cog w-6 text-gray-400"></i>
+                                <span class="ml-3">Settings</span>
+                            </a>
+                            
+                            <div class="border-t my-2"></div>
+                            
+                            <a href="{{ url_for('logout') }}" 
+                               class="flex items-center px-4 py-3 text-red-600 hover:bg-red-50 transition">
+                                <i class="fas fa-sign-out-alt w-6"></i>
+                                <span class="ml-3">Logout</span>
+                            </a>
+                        </div>
+                        
+                        <!-- Dropdown Footer -->
+                        <div class="px-4 py-3 bg-gray-50 border-t text-xs text-gray-500">
+                            <div class="flex justify-between">
+                                <span>Last login: Today</span>
+                                <span class="text-green-600 font-medium">● Active</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <a href="{{ url_for('logout') }}" 
-                   class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600 transition">
-                    Logout
-                </a>
             </div>
         </div>
     </header>
 
     <!-- Dashboard Content -->
     <div class="container mx-auto px-4 py-8">
-        <!-- User Info Card -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h2 class="text-2xl font-bold mb-6">Welcome, {{ user.name }}! 🎉</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <!-- Profile Information -->
-                <div class="bg-blue-50 p-6 rounded-lg">
-                    <h3 class="font-semibold text-lg mb-4 flex items-center">
-                        <i class="fas fa-user-circle mr-2 text-blue-600"></i>
-                        Profile Information
-                    </h3>
-                    <div class="space-y-3">
-                        <div class="flex items-center">
-                            <strong class="w-24">Name:</strong>
-                            <span>{{ user.name }}</span>
-                        </div>
-                        <div class="flex items-center">
-                            <strong class="w-24">Email:</strong>
-                            <span>{{ user.email }}</span>
-                        </div>
-                        {% if db_user %}
-                        <div class="flex items-center">
-                            <strong class="w-24">Member Since:</strong>
-                            <span>{{ db_user['created_at'] }}</span>
-                        </div>
-                        <div class="flex items-center">
-                            <strong class="w-24">Last Login:</strong>
-                            <span>{{ db_user['last_login'] }}</span>
-                        </div>
-                        <div class="flex items-center">
-                            <strong class="w-24">User ID:</strong>
-                            <span>{{ db_user['id'] }}</span>
-                        </div>
-                        {% else %}
-                        <div class="text-yellow-600">
-                            <i class="fas fa-exclamation-triangle mr-2"></i>
-                            Database record not found
-                        </div>
-                        {% endif %}
-                    </div>
+        <!-- Welcome Banner -->
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-xl p-6 mb-8 text-white">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">Welcome back, {{ user.name }}! 👋</h1>
+                    <p class="text-blue-100">Manage your documents, track orders, and explore services</p>
                 </div>
-
+                <div class="mt-4 md:mt-0">
+                    <span class="bg-white/20 px-4 py-2 rounded-full text-sm">
+                        <i class="fas fa-calendar-alt mr-2"></i>
+                        <span id="currentDate"></span>
+                    </span>
+                </div>
             </div>
         </div>
-
-
+        
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow p-6 border-l-4 border-blue-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Total Documents</p>
+                        <p class="text-2xl font-bold">24</p>
+                    </div>
+                    <i class="fas fa-file-alt text-3xl text-blue-500"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow p-6 border-l-4 border-green-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Active Orders</p>
+                        <p class="text-2xl font-bold">3</p>
+                    </div>
+                    <i class="fas fa-shopping-cart text-3xl text-green-500"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow p-6 border-l-4 border-purple-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Storage Used</p>
+                        <p class="text-2xl font-bold">65%</p>
+                    </div>
+                    <i class="fas fa-database text-3xl text-purple-500"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column: Profile Information -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
+                        <div class="flex items-center space-x-4">
+                            <img src="{{ user.picture }}" 
+                                 alt="Profile" 
+                                 class="w-20 h-20 rounded-full border-4 border-white/30 object-cover">
+                            <div>
+                                <h2 class="text-xl font-bold">{{ user.name }}</h2>
+                                <p class="text-blue-200 text-sm">{{ user.email }}</p>
+                                <span class="inline-block mt-2 bg-white/20 px-3 py-1 rounded-full text-xs">
+                                    Verified User
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg mb-4 flex items-center text-gray-700">
+                            <i class="fas fa-user-circle mr-2 text-blue-600"></i>
+                            Profile Information
+                        </h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <i class="fas fa-id-card text-gray-400 w-6"></i>
+                                <div class="ml-3">
+                                    <p class="text-sm text-gray-500">Full Name</p>
+                                    <p class="font-medium">{{ user.name }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <i class="fas fa-envelope text-gray-400 w-6"></i>
+                                <div class="ml-3">
+                                    <p class="text-sm text-gray-500">Email Address</p>
+                                    <p class="font-medium">{{ user.email }}</p>
+                                </div>
+                            </div>
+                            
+                            {% if db_user %}
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <i class="fas fa-calendar-plus text-gray-400 w-6"></i>
+                                <div class="ml-3">
+                                    <p class="text-sm text-gray-500">Member Since</p>
+                                    <p class="font-medium">{{ db_user.created_at.strftime('%d %B %Y') }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <i class="fas fa-clock text-gray-400 w-6"></i>
+                                <div class="ml-3">
+                                    <p class="text-sm text-gray-500">Last Login</p>
+                                    <p class="font-medium">{{ db_user.last_login.strftime('%I:%M %p, %d %B %Y') }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <i class="fas fa-fingerprint text-gray-400 w-6"></i>
+                                <div class="ml-3">
+                                    <p class="text-sm text-gray-500">User ID</p>
+                                    <p class="font-medium text-sm font-mono">{{ db_user.id }}</p>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>
+                                    <p class="text-yellow-700">Database record not found</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Edit Profile Button -->
+                        <a href="{{ url_for('edit_profile') }}" 
+                           class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium 
+                                  py-3 px-4 rounded-lg flex items-center justify-center transition">
+                            <i class="fas fa-edit mr-2"></i>
+                            Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Columns: Services Grid -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-rocket text-blue-600 mr-2"></i>
+                        Available Services
+                    </h2>
+                    <p class="text-gray-600 mb-8">Choose from our range of digital document services</p>
+                    
+                    <!-- Services Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Service Card 1 -->
+                        <a href="{{ url_for('document_creation') }}" 
+                           class="bg-gradient-to-br from-blue-50 to-white border border-blue-100 
+                                  rounded-xl p-6 card-hover hover:border-blue-300 transition-all">
+                            <div class="flex items-start mb-4">
+                                <div class="bg-blue-100 p-3 rounded-lg">
+                                    <i class="fas fa-file-contract text-blue-600 text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="font-bold text-lg text-gray-800">Document Creation</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Create legal and business documents</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-blue-600 font-medium">Get Started →</span>
+                                <span class="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-full">Popular</span>
+                            </div>
+                        </a>
+                        
+                        <!-- Service Card 2 -->
+                        <a href="{{ url_for('document_creation') }}" 
+                           class="bg-gradient-to-br from-green-50 to-white border border-green-100 
+                                  rounded-xl p-6 card-hover hover:border-green-300 transition-all">
+                            <div class="flex items-start mb-4">
+                                <div class="bg-green-100 p-3 rounded-lg">
+                                    <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="font-bold text-lg text-gray-800">Document Verification</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Verify and authenticate documents</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-green-600 font-medium">Verify Now →</span>
+                                <span class="text-xs bg-green-100 text-green-600 px-3 py-1 rounded-full">New</span>
+                            </div>
+                        </a>
+                        
+                        <!-- Service Card 3 -->
+                        <a href="{{ url_for('edit_profile') }}" 
+                           class="bg-gradient-to-br from-purple-50 to-white border border-purple-100 
+                                  rounded-xl p-6 card-hover hover:border-purple-300 transition-all">
+                            <div class="flex items-start mb-4">
+                                <div class="bg-purple-100 p-3 rounded-lg">
+                                    <i class="fas fa-signature text-purple-600 text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="font-bold text-lg text-gray-800">E-Signature</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Secure digital signatures</p>
+                                </div>
+                            </div>
+                            <span class="text-purple-600 font-medium">Sign Now →</span>
+                        </a>
+                        
+                        <!-- Service Card 4 -->
+                        <a href="{{ url_for('document_creation') }}" 
+                           class="bg-gradient-to-br from-orange-50 to-white border border-orange-100 
+                                  rounded-xl p-6 card-hover hover:border-orange-300 transition-all">
+                            <div class="flex items-start mb-4">
+                                <div class="bg-orange-100 p-3 rounded-lg">
+                                    <i class="fas fa-cloud-upload-alt text-orange-600 text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="font-bold text-lg text-gray-800">Secure Storage</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Cloud document storage</p>
+                                </div>
+                            </div>
+                            <span class="text-orange-600 font-medium">Store Now →</span>
+                        </a>
+                        
+                        <!-- Service Card 5 -->
+                        <a href="{{ url_for('orders') }}" 
+                           class="bg-gradient-to-br from-red-50 to-white border border-red-100 
+                                  rounded-xl p-6 card-hover hover:border-red-300 transition-all">
+                            <div class="flex items-start mb-4">
+                                <div class="bg-red-100 p-3 rounded-lg">
+                                    <i class="fas fa-stamp text-red-600 text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="font-bold text-lg text-gray-800">Notary Services</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Online notarization</p>
+                                </div>
+                            </div>
+                            <span class="text-red-600 font-medium">Notarize →</span>
+                        </a>
+                        
+                        <!-- Service Card 6 -->
+                        <a href="{{ url_for('document_creation') }}" 
+                           class="bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 
+                                  rounded-xl p-6 card-hover hover:border-indigo-300 transition-all">
+                            <div class="flex items-start mb-4">
+                                <div class="bg-indigo-100 p-3 rounded-lg">
+                                    <i class="fas fa-copy text-indigo-600 text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="font-bold text-lg text-gray-800">Templates Library</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Ready-to-use templates</p>
+                                </div>
+                            </div>
+                            <span class="text-indigo-600 font-medium">Browse →</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-history text-gray-600 mr-2"></i>
+                        Recent Activity
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition">
+                            <div class="bg-blue-100 p-2 rounded-lg">
+                                <i class="fas fa-upload text-blue-600"></i>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <p class="font-medium">Document Uploaded</p>
+                                <p class="text-sm text-gray-600">Contract_Agreement.pdf</p>
+                            </div>
+                            <span class="text-sm text-gray-500">2 hours ago</span>
+                        </div>
+                        
+                        <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition">
+                            <div class="bg-green-100 p-2 rounded-lg">
+                                <i class="fas fa-check text-green-600"></i>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <p class="font-medium">Order Completed</p>
+                                <p class="text-sm text-gray-600">Document Verification #ORD-7890</p>
+                            </div>
+                            <span class="text-sm text-gray-500">Yesterday</span>
+                        </div>
+                        
+                        <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition">
+                            <div class="bg-purple-100 p-2 rounded-lg">
+                                <i class="fas fa-signature text-purple-600"></i>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <p class="font-medium">E-Signature Request</p>
+                                <p class="text-sm text-gray-600">Waiting for your signature</p>
+                            </div>
+                            <span class="text-sm text-gray-500">2 days ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12 py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h2 class="text-2xl font-bold">Dasta<span class="text-yellow-400">wez</span></h2>
+                    <p class="text-gray-400 mt-2">Your trusted digital document partner</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-300 hover:text-white transition">Privacy Policy</a>
+                    <a href="#" class="text-gray-300 hover:text-white transition">Terms of Service</a>
+                    <a href="#" class="text-gray-300 hover:text-white transition">Contact Us</a>
+                    <a href="#" class="text-gray-300 hover:text-white transition">Help Center</a>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-gray-400 text-sm">
+                <p>© 2024 Dastawez. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Dropdown -->
+    <script>
+        // Profile Dropdown Toggle
+        const profileDropdownBtn = document.getElementById('profileDropdownBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+        
+        profileDropdownBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('hidden');
+            
+            // Rotate chevron icon
+            const chevron = this.querySelector('.fa-chevron-down');
+            chevron.classList.toggle('rotate-180');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!profileDropdown.contains(e.target) && !profileDropdownBtn.contains(e.target)) {
+                profileDropdown.classList.add('hidden');
+                const chevron = profileDropdownBtn.querySelector('.fa-chevron-down');
+                chevron.classList.remove('rotate-180');
+            }
+        });
+        
+        // Prevent dropdown from closing when clicking inside it
+        profileDropdown.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        
+        // Add current date for demo
+        if (typeof now === 'undefined') {
+            const dateElement = document.querySelector('.bg-gradient-to-r');
+            if (dateElement) {
+                const now = new Date();
+                const options = { month: 'long', day: 'numeric', year: 'numeric' };
+                dateElement.querySelector('span').textContent = now.toLocaleDateString('en-US', options);
+            }
+        }
+
+ // Display current date
+    const now = new Date();
+    const options = { month: 'long', day: 'numeric', year: 'numeric' };
+    document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+
+    </script>
 </body>
 </html>

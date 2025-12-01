@@ -27,3 +27,25 @@ for generate the secret key {
 for mongo db {
     python -m pip install "pymongo[srv]"
 }
+
+
+
+
+folder structure {
+    flask-dastawez/
+    ├── app.py                    # Main Flask application (Entry point)
+    ├── .env                      # Environment variables
+    ├── requirements.txt          # Python dependencies
+    ├── vercel.json              # Vercel deployment config
+    ├── database/
+    │   └── mongo.py             # MongoDB connection setup
+    ├── models/
+    │   └── user_model.py        # User data model/class
+    ├── services/
+    │   └── user_service.py      # Business logic & database operations
+    ├── routes/
+    │   └── user_routes.py       # API routes/endpoints
+    ├── templates/               # HTML templates
+    ├── static/                  # CSS, JS, images
+    └── .venv/                   # Virtual environment
+}

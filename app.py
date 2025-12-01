@@ -4,6 +4,7 @@ from authlib.integrations.flask_client import OAuth
 import os
 from functools import wraps
 from dotenv import load_dotenv
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
@@ -34,7 +35,7 @@ app.config.update(
 )
 
 # Register blueprints
-app.register_blueprint(user_routes, url_prefix='/api')
+# app.register_blueprint(user_routes, url_prefix='/api') # Temporarily commented out for debugging
 
 # OAuth Configuration
 oauth = OAuth(app)
@@ -162,14 +163,21 @@ def logout():
     return redirect(url_for('index'))
 
 @app.route('/dashboard')
-@login_required
+# @login_required # Temporarily commented out for debugging
 def dashboard():
     user = session.get('user')
     if user:
         from services.user_service import get_user_by_email
         db_user = get_user_by_email(user['email'])
         print(f"📊 Dashboard accessed by: {user['email']}, DB user: {db_user is not None}")
-        return render_template('dashboard.html', user=user, db_user=db_user)
+        
+        # Add current date to template
+        return render_template(
+            'dashboard.html', 
+            user=user, 
+            db_user=db_user,
+            now=datetime.now()  # Add current datetime
+        )
     return redirect(url_for('index'))
 
 @app.route('/admin')
@@ -254,6 +262,38 @@ def debug_ping():
             "error": str(e)
         }
 
+
+
+@app.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html', user=session.get('user'))
+
+@app.route('/orders')
+@login_required
+def orders():
+    return render_template('orders.html', user=session.get('user'))
+
+@app.route('/settings')
+@login_required
+def settings():
+    return render_template('settings.html', user=session.get('user'))
+
+@app.route('/edit_profile')
+@login_required
+def edit_profile():
+    return render_template('edit_profile.html', user=session.get('user'))
+
+# Add similar routes for services
+@app.route('/document_creation')
+@login_required
+def document_creation():
+    return render_template('document_creation.html', user=session.get('user'))
+
+
+
+
+
 if __name__ == '__main__':
     # Ensure MongoDB is connected before starting
     print("🚀 Starting Flask application...")
@@ -263,4 +303,9 @@ if __name__ == '__main__':
     print(f"📊 Database: {db.name}")
     print(f"🔗 Connection status: {'Connected' if db_connection.client is not None else 'Disconnected'}")
     
+    print("\n📝 Registered URL Rules:")
+    for rule in app.url_map.iter_rules():
+        print(f"  Endpoint: {rule.endpoint}, Methods: {rule.methods}, Rule: {rule.rule}")
+    print("--- End URL Rules ---\n")
+
     app.run(debug=True, host='0.0.0.0', port=5000)
