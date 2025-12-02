@@ -42,110 +42,95 @@
                                         
                     <!-- Services Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Service Card 1 -->
-                        <a href="{{ url_for('document_creation') }}" 
-                           class="bg-gradient-to-br from-blue-50 to-white border border-blue-100 
-                                  rounded-xl p-6 card-hover hover:border-blue-300 transition-all">
-                            <div class="flex items-start mb-4">
-                                <div class="bg-blue-100 p-3 rounded-lg">
-                                    <i class="fas fa-file-contract text-blue-600 text-2xl"></i>
-                                </div>
-                                <div class="ml-4">
-                                    <h3 class="font-bold text-lg text-gray-800">Document Creation</h3>
-                                    <p class="text-sm text-gray-600 mt-1">Create legal and business documents</p>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-blue-600 font-medium">Get Started →</span>
-                                <span class="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-full">Popular</span>
-                            </div>
-                        </a>
-                        
-                        <!-- Service Card 2 -->
-                        <!-- <a href="{{ url_for('document_creation') }}" 
-                           class="bg-gradient-to-br from-green-50 to-white border border-green-100 
-                                  rounded-xl p-6 card-hover hover:border-green-300 transition-all">
-                            <div class="flex items-start mb-4">
-                                <div class="bg-green-100 p-3 rounded-lg">
-                                    <i class="fas fa-check-circle text-green-600 text-2xl"></i>
-                                </div>
-                                <div class="ml-4">
-                                    <h3 class="font-bold text-lg text-gray-800">Document Verification</h3>
-                                    <p class="text-sm text-gray-600 mt-1">Verify and authenticate documents</p>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-green-600 font-medium">Verify Now →</span>
-                                <span class="text-xs bg-green-100 text-green-600 px-3 py-1 rounded-full">New</span>
-                            </div>
-                        </a> -->
-                        
-                        <!-- Service Card 3 -->
-                        <!-- <a href="{{ url_for('edit_profile') }}" 
-                           class="bg-gradient-to-br from-purple-50 to-white border border-purple-100 
-                                  rounded-xl p-6 card-hover hover:border-purple-300 transition-all">
-                            <div class="flex items-start mb-4">
-                                <div class="bg-purple-100 p-3 rounded-lg">
-                                    <i class="fas fa-signature text-purple-600 text-2xl"></i>
-                                </div>
-                                <div class="ml-4">
-                                    <h3 class="font-bold text-lg text-gray-800">E-Signature</h3>
-                                    <p class="text-sm text-gray-600 mt-1">Secure digital signatures</p>
-                                </div>
-                            </div>
-                            <span class="text-purple-600 font-medium">Sign Now →</span>
-                        </a> -->
-                        
-                        <!-- Service Card 4 -->
-                        <!-- <a href="{{ url_for('document_creation') }}" 
-                           class="bg-gradient-to-br from-orange-50 to-white border border-orange-100 
-                                  rounded-xl p-6 card-hover hover:border-orange-300 transition-all">
-                            <div class="flex items-start mb-4">
-                                <div class="bg-orange-100 p-3 rounded-lg">
-                                    <i class="fas fa-cloud-upload-alt text-orange-600 text-2xl"></i>
-                                </div>
-                                <div class="ml-4">
-                                    <h3 class="font-bold text-lg text-gray-800">Secure Storage</h3>
-                                    <p class="text-sm text-gray-600 mt-1">Cloud document storage</p>
-                                </div>
-                            </div>
-                            <span class="text-orange-600 font-medium">Store Now →</span>
-                        </a> -->
-                        
-                        <!-- Service Card 5 -->
-                        <a href="{{ url_for('orders') }}" 
-                           class="bg-gradient-to-br from-red-50 to-white border border-red-100 
-                                  rounded-xl p-6 card-hover hover:border-red-300 transition-all">
-                            <div class="flex items-start mb-4">
-                                <div class="bg-red-100 p-3 rounded-lg">
-                                    <i class="fas fa-stamp text-red-600 text-2xl"></i>
-                                </div>
-                                <div class="ml-4">
-                                    <h3 class="font-bold text-lg text-gray-800">Notary Services</h3>
-                                    <p class="text-sm text-gray-600 mt-1">Online notarization</p>
-                                </div>
-                            </div>
-                            <span class="text-red-600 font-medium">Notarize →</span>
-                        </a>
-                        
-                        <!-- Service Card 6 -->
-                        <!-- <a href="{{ url_for('document_creation') }}" 
+
+
+                        <!-- Service Card 1 - Affidavit Making -->
+                        <a href="{{ url_for('affidavit_creation') }}" 
                            class="bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 
                                   rounded-xl p-6 card-hover hover:border-indigo-300 transition-all">
                             <div class="flex items-start mb-4">
                                 <div class="bg-indigo-100 p-3 rounded-lg">
-                                    <i class="fas fa-copy text-indigo-600 text-2xl"></i>
+                                    <i class="fas fa-scale-balanced text-indigo-600 text-2xl"></i>
                                 </div>
                                 <div class="ml-4">
-                                    <h3 class="font-bold text-lg text-gray-800">Templates Library</h3>
-                                    <p class="text-sm text-gray-600 mt-1">Ready-to-use templates</p>
+                                    <h3 class="font-bold text-lg text-gray-800">Affidavit Creation</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Create legally binding affidavits</p>
                                 </div>
                             </div>
-                            <span class="text-indigo-600 font-medium">Browse →</span>
-                        </a> -->
+                            <div class="flex justify-between items-center">
+                                <span class="text-indigo-600 font-medium">Create Affidavit →</span>
+                                <span class="text-xs bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">Legal</span>
+                            </div>
+                        </a>
+
+
+                        <!-- Service Card 2 - Premium Project Printing -->
+                        <a class="bg-gradient-to-br from-fuchsia-50 to-white border border-fuchsia-100 
+                                  rounded-xl p-6 card-hover hover:border-fuchsia-300 transition-all">
+                            <div class="flex items-start mb-4">
+                                <div class="bg-fuchsia-100 p-3 rounded-lg">
+                                    <i class="fas fa-book-open text-fuchsia-600 text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="font-bold text-lg text-gray-800">Academic Project</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Professional printing & binding</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-fuchsia-600 font-medium">Get Quote →</span>
+                                <div class="text-right">
+                                    <span class="text-xs bg-fuchsia-100 text-fuchsia-600 px-3 py-1 rounded-full block mb-1">Hard/Soft Bind</span>
+                                    <span class="text-xs text-gray-500">Color & B/W options</span>
+                                </div>
+                            </div>
+                        </a>
+
+                        <!-- Service Card 3 - Documents Printing -->
+                        <a href="{{ url_for('document_printing') }}" 
+                           class="bg-gradient-to-br from-cyan-50 to-white border border-cyan-100 
+                                  rounded-xl p-6 card-hover hover:border-cyan-300 transition-all">
+                            <div class="flex items-start mb-4">
+                                <div class="bg-cyan-100 p-3 rounded-lg">
+                                    <i class="fas fa-print text-cyan-600 text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="font-bold text-lg text-gray-800">Document Printing</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Professional printing & delivery</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-cyan-600 font-medium">Print Now →</span>
+                                <span class="text-xs bg-cyan-100 text-cyan-600 px-3 py-1 rounded-full">Fast Delivery</span>
+                            </div>
+                        </a>
+
+                        <!-- Service Card 4 - Resume Building -->
+                        <a class="bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 
+                                  rounded-xl p-6 card-hover hover:border-emerald-300 transition-all">
+                            <div class="flex items-start mb-4">
+                                <div class="bg-emerald-100 p-3 rounded-lg">
+                                    <i class="fas fa-file-alt text-emerald-600 text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="font-bold text-lg text-gray-800">ATS Resume Builder</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Professional resumes with 80+ ATS score</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-emerald-600 font-medium">Build Resume →</span>   
+                                <div class="flex items-center">
+                                    <div class="mr-2">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-star text-yellow-500 text-xs mr-1"></i>
+                                            <span class="text-xs font-bold text-gray-700">80+ ATS</span>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full">Guaranteed</span>
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
-                
             </div>
         </div>
     </div>

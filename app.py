@@ -291,6 +291,19 @@ def document_creation():
     return render_template('document_creation.html', user=session.get('user'))
 
 
+# Add similar routes for services
+@app.route('/affidavit_creation')
+@login_required
+def affidavit_creation():
+    return render_template('document_creation.html', user=session.get('user'))
+
+
+# Add similar routes for services
+@app.route('/document_printing')
+@login_required
+def document_printing():
+    return render_template('document_printing.html', user=session.get('user'))
+
 
 
 
