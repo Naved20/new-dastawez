@@ -4,7 +4,7 @@ from authlib.integrations.flask_client import OAuth
 import os
 from functools import wraps
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Load environment variables
 load_dotenv()
@@ -24,18 +24,42 @@ db_connection.init_app(app)
 
 # Session Configuration
 app.config.update(
-    SESSION_COOKIE_SECURE=False if not os.getenv('VERCEL') else True,
+    PERAMENTENT_SESSION_LIFETIME=timedelta(days=30),
+    SESSION_COOKIE_NAME='dastawez_session',
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='Lax',
-    PERMANENT_SESSION_LIFETIME=3600,
-    SESSION_COOKIE_DOMAIN=None,
-    SESSION_REFRESH_EACH_REQUEST=True,
+    SESSION_PROTECTION='strong',
+
+    REMEMBER_COOKIE_DURATION=timedelta(days=30),
+    REMEMBER_COOKIE_SECURE=True,
+    REMEMBER_COOKIE_HTTPONLY=True,
+    REMEMBER_COOKIE_SAMESITE='Lax',
     # Add MongoDB URI to config
     MONGO_URI=os.getenv("MONGO_URI"),
     DB_NAME=os.getenv("DB_NAME", "dastawez")
 )
 
-# Register blueprints
-# app.register_blueprint(user_routes, url_prefix='/api') # Temporarily commented out for debugging
+
+@app.before_request
+def before_request():
+    """Make the database accessible via 'g' during requests"""
+    g.db = db_connection.get_db()
+
+    #check session cookie
+    session_id = request.cookies.get('SESSION_COOKIE_NAME')
+    if session_id:
+        user_session =user_session.get_by_id(session_id)
+        if user_session and user_session.is_valid():
+            from services.user_service import get_user_by_email
+            use = get_user_by_email(user_session.user_email)
+            if user:
+                g.user = user = {
+                    'name': user.get('name'),
+                    'email': user.get('email'),
+                    'picture': user.get('picture')
+                }
+
 
 # OAuth Configuration
 oauth = OAuth(app)
@@ -93,6 +117,8 @@ def login_required(f):
 @app.route('/')
 def index():
     user = session.get('user')
+    if user:
+        return redirect(url_for('dashboard'))
     return render_template('index.html', user=user)
 
 @app.route('/login')

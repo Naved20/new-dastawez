@@ -104,28 +104,12 @@
         </div>
 
         <nav class="md:block" id="mainNav">
-            {% if user %}
-            <div class="flex items-center space-x-4">
-                <div class="flex items-center space-x-2">
-                    <img src="{{ user.picture }}" alt="Profile" class="w-8 h-8 rounded-full">
-                    <span class="text-white text-sm">{{ user.name }}</span>
-                </div>
-                <a href="{{ url_for('dashboard') }}" 
-                   class="glass-morphism-button bg-white bg-opacity-20 backdrop-blur-md text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-30 transition-all duration-300 border border-white border-opacity-30 shadow-lg hover:shadow-xl">
-                    Dashboard
-                </a>
-                <a href="{{ url_for('logout') }}" 
-                   class="glass-morphism-button bg-red-500 bg-opacity-20 backdrop-blur-md text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-30 transition-all duration-300 border border-white border-opacity-30 shadow-lg hover:shadow-xl">
-                    Logout
-                </a>
-            </div>
-            {% else %}
+
             <a href="{{ url_for('login') }}" 
             class="glass-morphism-button bg-white bg-opacity-20 backdrop-blur-md text-white font-semibold py-2 px-6 rounded-lg hover:bg-opacity-30 transition-all duration-300 border border-white border-opacity-30 shadow-lg hover:shadow-xl hover:scale-105">
                
                 Login 
             </a>
-            {% endif %}
         </nav>
     </div>
 </header>
