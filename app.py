@@ -65,6 +65,12 @@ def before_request():
 def manifest():
     return send_from_directory('static', 'manifest.json')
 
+@app.route('/service-worker.js')
+def service_worker():
+    response = send_from_directory('static', 'service-worker.js')
+    response.headers['Content-Type'] = 'application/javascript'
+    response.headers['Service-Worker-Allowed'] = '/'
+    return response
 
 # OAuth Configuration
 oauth = OAuth(app)

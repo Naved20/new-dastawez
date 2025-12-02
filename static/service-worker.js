@@ -1,14 +1,29 @@
-// Simple service worker
+// static/service-worker.js
 const CACHE_NAME = 'dastawez-v1';
+const urlsToCache = [
+  '/',
+  '/static/img/logo.png'
+];
 
-self.addEventListener('install', (event) => {
-  console.log('Service Worker: Installed');
+// Install
+self.addEventListener('install', event => {
+  console.log('Service Worker: Installing...');
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('Caching files');
+        return cache.addAll(urlsToCache);
+      })
+  );
 });
 
-self.addEventListener('fetch', (event) => {
+// Fetch
+self.addEventListener('fetch', event => {
   event.respondWith(
-    fetch(event.request).catch(() => {
-      console.log('Offline: Serving from cache');
-    })
+    caches.match(event.request)
+      .then(response => {
+        // Return cached version or fetch from network
+        return response || fetch(event.request);
+      })
   );
 });
