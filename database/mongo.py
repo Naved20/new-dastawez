@@ -22,11 +22,7 @@ class MongoDBConnection:
         """Initialize MongoDB with Flask app"""
         self._initialized = True
         
-        @app.teardown_appcontext
-        def close_db(exception=None):
-            """Close database connection at app teardown"""
-            if self._client:
-                self.close()
+
     
     def connect(self):
         """Connect to MongoDB Atlas"""
