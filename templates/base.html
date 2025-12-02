@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Dastawez</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/jpg" href="../static/img/logo.png" />
+    
+ <style>
+        /* Custom animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .dropdown-animation {
+            animation: fadeIn 0.2s ease-out;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Top Left: Company/Brand Logo -->
+                <div class="logo flex items-center">
+                    <div class="h-12 w-12 bg-white rounded-full flex items-center justify-center mr-3 overflow-hidden shadow-md">
+                        <img src="{{ url_for('static', filename='img/logo.jpg') }}" 
+                             alt="Dastawez Logo" 
+                             class="h-full w-full object-cover">
+                    </div>
+                    <div>
+                        <h1 class="text-white text-2xl font-bold">Dasta<span class="text-yellow-400">wez</span></h1>
+                        <p class="text-blue-200 text-xs">Your Digital Document Manager</p>
+                    </div>
+                </div>
+                
+                <!-- Top Right: User Profile Section with Dropdown -->
+                <div class="relative">
+                    <!-- Profile Button -->
+                    <button id="profileDropdownBtn" 
+                            class="flex items-center space-x-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm 
+                                   rounded-xl px-4 py-2 transition-all duration-200 focus:outline-none 
+                                   focus:ring-2 focus:ring-white/30">
+                        <!-- User Avatar -->
+                        <div class="relative">
+                            <img src="{{ user.picture }}" 
+                                 alt="Profile" 
+                                 class="w-10 h-10 rounded-full border-2 border-white/30 object-cover">
+                            <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                        </div>
+                        
+                        <!-- User Name and Role -->
+                        <div class="text-left hidden md:block">
+                            <p class="text-white font-medium text-sm">{{ user.name }}</p>
+                            <p class="text-blue-200 text-xs">
+                                {% if user.email == 'admin@example.com' %}
+                                    Administrator
+                                {% else %}
+                                    Premium User
+                                {% endif %}
+                            </p>
+                        </div>
+                        
+                        <!-- Dropdown Icon -->
+                        <i class="fas fa-chevron-down text-white/70 text-sm transition-transform duration-200"></i>
+                    </button>
+                    
+                    <!-- Dropdown Menu -->
+                    <div id="profileDropdown" 
+                         class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl 
+                                border border-gray-200 overflow-hidden dropdown-animation hidden 
+                                transform origin-top-right">
+                        
+                        <!-- Dropdown Header -->
+                        <div class="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+                            <div class="flex items-center space-x-3">
+                                <img src="{{ user.picture }}" 
+                                     alt="Profile" 
+                                     class="w-12 h-12 rounded-full border-2 border-white shadow">
+                                <div>
+                                    <p class="font-semibold text-gray-800">{{ user.name }}</p>
+                                    <p class="text-sm text-gray-600">{{ user.email }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Dropdown Items -->
+                        <div class="py-2">
+                            <a href="{{ url_for('profile') }}" 
+                               class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                                <i class="fas fa-user-circle w-6 text-gray-400"></i>
+                                <span class="ml-3">Profile</span>
+                            </a>
+                            
+                            <a href="{{ url_for('orders') }}" 
+                               class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                                <i class="fas fa-shopping-bag w-6 text-gray-400"></i>
+                                <span class="ml-3">Orders</span>
+                                <span class="ml-auto bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full">3 new</span>
+                            </a>
+                            
+                            <a href="{{ url_for('settings') }}" 
+                               class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                                <i class="fas fa-cog w-6 text-gray-400"></i>
+                                <span class="ml-3">Settings</span>
+                            </a>
+                            
+                            <div class="border-t my-2"></div>
+                            
+                            <a href="{{ url_for('logout') }}" 
+                               class="flex items-center px-4 py-3 text-red-600 hover:bg-red-50 transition">
+                                <i class="fas fa-sign-out-alt w-6"></i>
+                                <span class="ml-3">Logout</span>
+                            </a>
+                        </div>
+                        
+                        <!-- Dropdown Footer -->
+                        <div class="px-4 py-3 bg-gray-50 border-t text-xs text-gray-500">
+                            <div class="flex justify-between">
+                                <span>Last login: Today</span>
+                                <span class="text-green-600 font-medium">● Active</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    {% block content %}{% endblock %}
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white pt-12 pb-6">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-wrap gap-8 mb-8">
+                <!-- About Column -->
+                <div class="flex-1 min-w-[200px]">
+                    <div class="flex items-center mb-4">
+                        <div class="h-12 w-12 bg-white rounded-full flex items-center justify-center mr-3 overflow-hidden">
+                          <img src="../static/img/logo.jpg" alt="" class="h-full w-full object-cover">
+                        </div>
+                        <h3 class="text-xl font-bold">Dasta<span class="text-yellow-400">wez</span></h3>
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        Your trusted partner for all document and government service needs.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://chat.whatsapp.com/ELYNoYxFIaC6p4ztD8WPQh" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="https://www.instagram.com/dastawez.in?igsh=MXZnZmFoNzhuNTlncg==" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Services Column -->
+                <div class="flex-1 min-w-[200px]">
+                    <h3 class="text-lg font-semibold mb-4">Services</h3>
+                    <ul class="space-y-2">
+                        <li><a href="./index.html" class="text-gray-400 hover:text-white footer-link">MP Online Services</a></li>
+                        <li><a href="./index.html" class="text-gray-400 hover:text-white footer-link">Academic Forms</a></li>
+                        <li><a href="./index.html" class="text-gray-400 hover:text-white footer-link">Document Services</a></li>
+                        <li><a href="./index.html" class="text-gray-400 hover:text-white footer-link">Digital Services</a></li>
+                        <li><a href="./index.html" class="text-gray-400 hover:text-white footer-link">Exam Forms</a></li>
+                        <li><a href="./invoice.html" class="text-gray-400 hover:text-white footer-link">Invoice</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Quick Links Column -->
+                <div class="flex-1 min-w-[200px]">
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-gray-400 hover:text-white footer-link">Home</a></li>
+                        <li><a href="#services" class="text-gray-400 hover:text-white footer-link">Services</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-white footer-link">Contact</a></li>
+                        <li><a href="./about.html" class="text-gray-400 hover:text-white footer-link">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white footer-link">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact Column -->
+                <div class="flex-1 min-w-[200px]">
+                    <h3 class="text-lg font-semibold mb-4">Contact Info</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-3 text-blue-400"></i>
+                            <span>Bhopal, Madhya Pradesh, India</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-phone-alt mt-1 mr-3 text-blue-400"></i>
+                            <a href="tel:+917898282349" class="hover:text-white">+91-7898282349</a>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-envelope mt-1 mr-3 text-blue-400"></i>
+                            <a href="mailto:dastawez.in@gmail.com" class="hover:text-white">dastawez.in@gmail.com</a>
+                        </li>
+                         <li class="flex items-start">
+                            <i class="fas fa-tree mt-1 mr-3 text-blue-400"></i>
+                            <a href="https://linktr.ee/dastawez" class="hover:text-white">Link Tree</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="pt-6 mt-6 border-t border-gray-700 text-center text-gray-500 text-sm">
+                <p>&copy; 2025 Dastawez. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+
+</body>
+</html>

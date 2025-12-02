@@ -1,0 +1,85 @@
+            <!-- Left Column: Profile Information -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
+                        <div class="flex items-center space-x-4">
+                            <img src="{{ user.picture }}" 
+                                 alt="Profile" 
+                                 class="w-20 h-20 rounded-full border-4 border-white/30 object-cover">
+                            <div>
+                                <h2 class="text-xl font-bold">{{ user.name }}</h2>
+                                <p class="text-blue-200 text-sm">{{ user.email }}</p>
+                                <span class="inline-block mt-2 bg-white/20 px-3 py-1 rounded-full text-xs">
+                                    Verified User
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg mb-4 flex items-center text-gray-700">
+                            <i class="fas fa-user-circle mr-2 text-blue-600"></i>
+                            Profile Information
+                        </h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <i class="fas fa-id-card text-gray-400 w-6"></i>
+                                <div class="ml-3">
+                                    <p class="text-sm text-gray-500">Full Name</p>
+                                    <p class="font-medium">{{ user.name }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <i class="fas fa-envelope text-gray-400 w-6"></i>
+                                <div class="ml-3">
+                                    <p class="text-sm text-gray-500">Email Address</p>
+                                    <p class="font-medium">{{ user.email }}</p>
+                                </div>
+                            </div>
+                            
+                            {% if db_user %}
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <i class="fas fa-calendar-plus text-gray-400 w-6"></i>
+                                <div class="ml-3">
+                                    <p class="text-sm text-gray-500">Member Since</p>
+                                    <p class="font-medium">{{ db_user.created_at.strftime('%d %B %Y') }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <i class="fas fa-clock text-gray-400 w-6"></i>
+                                <div class="ml-3">
+                                    <p class="text-sm text-gray-500">Last Login</p>
+                                    <p class="font-medium">{{ db_user.last_login.strftime('%I:%M %p, %d %B %Y') }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <i class="fas fa-fingerprint text-gray-400 w-6"></i>
+                                <div class="ml-3">
+                                    <p class="text-sm text-gray-500">User ID</p>
+                                    <p class="font-medium text-sm font-mono">{{ db_user.id }}</p>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>
+                                    <p class="text-yellow-700">Database record not found</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Edit Profile Button -->
+                        <a href="{{ url_for('edit_profile') }}" 
+                           class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium 
+                                  py-3 px-4 rounded-lg flex items-center justify-center transition">
+                            <i class="fas fa-edit mr-2"></i>
+                            Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
