@@ -1,5 +1,5 @@
 # app.py
-from flask import Flask, render_template, request, redirect, url_for, session, flash, g
+from flask import Flask, make_response, render_template, request, redirect, send_from_directory, url_for, session, flash, g
 from authlib.integrations.flask_client import OAuth
 import os
 from functools import wraps
@@ -59,6 +59,11 @@ def before_request():
                     'email': user.get('email'),
                     'picture': user.get('picture')
                 }
+
+
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory('static', 'manifest.json')
 
 
 # OAuth Configuration
