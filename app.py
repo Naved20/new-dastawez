@@ -1,10 +1,11 @@
 # app.py
-from flask import Flask, make_response, render_template, request, redirect, send_from_directory, url_for, session, flash, g
+from flask import Flask, jsonify, make_response, render_template, request, redirect, send_from_directory, url_for, session, flash, g
 from authlib.integrations.flask_client import OAuth
 import os
 from functools import wraps
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
+from routes.user_routes import user_routes
 
 # Load environment variables
 load_dotenv()
@@ -343,19 +344,16 @@ def document_printing():
 
 
 
+@app.route("/get-users", methods=["GET"])
+def get_users():
+    users_collection = get_users_collection()   # <--- define it here
+    data = list(users_collection.find({}, {"_id": 0}))
+    return jsonify(data)
+
+
+
 
 if __name__ == '__main__':
-    # Ensure MongoDB is connected before starting
-    print("🚀 Starting Flask application...")
-    
-    # Connect to MongoDB
+        # Connect to MongoDB
     db = db_connection.get_db()
-    print(f"📊 Database: {db.name}")
-    print(f"🔗 Connection status: {'Connected' if db_connection.client is not None else 'Disconnected'}")
-    
-    print("\n📝 Registered URL Rules:")
-    for rule in app.url_map.iter_rules():
-        print(f"  Endpoint: {rule.endpoint}, Methods: {rule.methods}, Rule: {rule.rule}")
-    print("--- End URL Rules ---\n")
-
     app.run(debug=True, host='0.0.0.0', port=5000)
